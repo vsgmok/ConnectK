@@ -4,7 +4,7 @@
 
 
 
-AIShell::AIShell(int numCols, int numRows, bool gravityOn, int** gameState, Move move)
+AIShell::AIShell(int numCols, int numRows, bool gravityOn, int** gameState, Move lastMove)
 {
     this->deadline=0;
     this->numRows=numRows;
