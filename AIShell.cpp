@@ -259,7 +259,7 @@ Move AIShell::makeMove(){
     if(moves.size() == 1)
         return moves.back();
     
-    auto start_time =  std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point start_time =  std::chrono::steady_clock::now();
     
     if(lastMove.col != -1 && lastMove.row != -1)
     {
@@ -570,22 +570,24 @@ Move AIShell::makeMove(){
     
     std::cout << "MAKING IDS MOVE" << std::endl;
     
-    std::chrono::milliseconds ms(5000);
+    std::chrono::milliseconds ms(deadline-1000);
     
     int depth_limit = 1;
+    
+    Move best_move_so_far = Move(-1000,-1000);
         
+    int ok = 0;
     while(true)
     {
         auto current_time =  std::chrono::steady_clock::now();
         auto total_time = current_time - start_time;
         
-        
-        
         if(std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count() >= ms.count())
             break;
-        for(int i = 1; i <= depth_limit; i++)
+        ok = min_max(gameState,true,0,depth_limit,-1000,1000,Move(0,0),start_time);
+        if (ok != -10000)
         {
-            min_max(gameState,true,0,i,-1000,1000,Move(0,0));
+            best_move_so_far = best_moves.back().first;
         }
         depth_limit+=1;
     }
@@ -594,16 +596,22 @@ Move AIShell::makeMove(){
         //value = std::max(min_max(gameState,true,0,-1000,1000,Move(0,0)),value);
     
     std::cout << "DEPTH: " << depth_limit << std::endl;
-    return best_moves.back().first;
+    return best_move_so_far;
+    //return best_moves.back().first;
 }
 
-int AIShell::min_max(int** state, bool max, int depth,int cutoff, int alpha, int beta, Move previousMove)
+int AIShell::min_max(int** state, bool max, int depth,int cutoff, int alpha, int beta, Move previousMove, std::chrono::steady_clock::time_point start_time)
 {
     int tempV;
     std::vector<Move> moves = availableMoves(state);
     
     //int alpha;
     //int beta;
+    auto current_time = std::chrono::steady_clock::now();
+    std::chrono::milliseconds ms(deadline-1000);
+    auto total_time = current_time - start_time;
+    if(std::chrono::duration_cast<std::chrono::milliseconds>(total_time).count() >= ms.count())
+        return -10000;
     
     int value = (max ? -1000 : 1000);
     
@@ -620,7 +628,7 @@ int AIShell::min_max(int** state, bool max, int depth,int cutoff, int alpha, int
         {
             state[moves[i].col][moves[i].row] = AI_PIECE;
             //std::cout << "At Depth " << depth << " AI made move at: col " << moves[i].col << " and row " << moves[i].row << std::endl;
-            tempV = min_max(state,false,depth+1,cutoff,alpha,beta, Move(moves[i].col,moves[i].row));
+            tempV = min_max(state,false,depth+1,cutoff,alpha,beta, Move(moves[i].col,moves[i].row), start_time);
             state[moves[i].col][moves[i].row] = NO_PIECE;
             
             //Alpha Beta Pruning
@@ -672,7 +680,7 @@ int AIShell::min_max(int** state, bool max, int depth,int cutoff, int alpha, int
             
             state[moves[i].col][moves[i].row] = HUMAN_PIECE;
             //std::cout << "At Depth " << depth << " Human made move at: col " << moves[i].col << " and row " << moves[i].row << std::endl;
-            tempV = min_max(state,true,depth+1,cutoff,alpha,beta,Move(moves[i].col,moves[i].row));
+            tempV = min_max(state,true,depth+1,cutoff,alpha,beta,Move(moves[i].col,moves[i].row), start_time);
             state[moves[i].col][moves[i].row] = NO_PIECE;
             
             //Alpha Beta Pruning

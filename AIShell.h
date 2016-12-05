@@ -4,8 +4,8 @@
 #pragma once
 #include "Move.h"
 #include <vector>
-#include <algorithm>
 #include <chrono>
+#include <algorithm>
 #include <sys/time.h>
 #include <map>
 
@@ -34,7 +34,7 @@ private:
     std::vector<std::pair<Move,int> > best_moves;
     
     
-    int min_max(int** state, bool max, int depth, int cutoff, int alpha, int beta, Move previousMove);
+    int min_max(int** state, bool max, int depth, int cutoff, int alpha, int beta, Move previousMove, std::chrono::steady_clock::time_point start_time);
     
     bool terminalState(Move m);
     int heuristic(int** state, Move previousMove);
