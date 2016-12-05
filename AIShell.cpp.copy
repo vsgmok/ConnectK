@@ -27,120 +27,7 @@ AIShell::~AIShell()
     
 }
 
-Move AIShell::check_empty(int** state) {
-    
-    //Default:
-    Move best_move = Move(-1000,-1000);
 
-    std::vector<std::string> dirs;
-    dirs.push_back("up");
-    dirs.push_back("down");
-    dirs.push_back("left");
-    dirs.push_back("right");
-    dirs.push_back("downleft");
-    dirs.push_back("downright");
-    dirs.push_back("upright");
-    dirs.push_back("upleft");
-
-    std::string best_dir;
-    int best_val = 0;
-    int val;
-    
-    int d[2];
-
-    Move tempMove = lastMove;
-    Move emptyMove(-1000, -1000);
-
-    for (std::string dir : dirs) {
-        if (dir == "up")
-        {
-            d[0] = 0;
-            d[1] = 1;
-        }
-        else if (dir == "down")
-        {
-            d[0] = 0;
-            d[1] = -1;
-        }
-        else if (dir == "left")
-        {
-            d[0] = -1;
-            d[1] = 0;
-        }
-        else if (dir == "right")
-        {
-            d[0] = 1;
-            d[1] = 0;
-        }
-        else if (dir == "upright")
-        {
-            d[0] = 1;
-            d[1] = 1;
-        }
-        else if (dir == "downright")
-        {
-            d[0] = 1;
-            d[1] = -1;
-        }
-        else if (dir == "downleft")
-        {
-            d[0] = -1;
-            d[1] = -1;
-        }
-        else if (dir == "upleft")
-        {
-            d[0] = -1;
-            d[1] = 1;
-        }
-        
-
-        val = 0; //Number of human pieces
-    
-        tempMove = lastMove;
-
-        for (int offset = 0; offset < k; ++offset)
-        {
-            
-            tempMove.col = lastMove.col + offset*d[0];
-            tempMove.row = lastMove.row + offset*d[1];
-            std::cout << "col: " << tempMove.col << ", row: " << tempMove.row << ", offset: " << offset << ", offset*d[0]: " << offset*d[0] << std::endl;
-
-            if (tempMove.col >= numCols || \
-                tempMove.row >= numRows || \
-                tempMove.col < 0 || \
-                tempMove.row < 0)
-            {
-                break; //out of bounds
-            }
-
-            if (state[tempMove.col][tempMove.row] == HUMAN_PIECE)
-            {
-                ++val;
-            }
-            else if (state[tempMove.col][tempMove.row] == NO_PIECE)
-            {
-                emptyMove = tempMove;
-            }
-        }
-        std::cout << "Checking direction " << dir << std::endl;
-        std::cout << "Value: " << val << std::endl << std::endl;
-
-        if (val > best_val) 
-        {
-            if (emptyMove.col != -1000 && emptyMove.row != -1000)
-            {
-                best_move = emptyMove;
-                best_val = val;
-                best_dir = dir;
-            }
-        }
-    }
-    if (best_val >= 3)
-    {
-        return best_move;
-    }
-    return Move(-1000,-1000);
-}
 
 Move AIShell::makeMove(){
 
@@ -152,14 +39,90 @@ Move AIShell::makeMove(){
     
     auto start_time =  std::chrono::steady_clock::now();
     
+    
+    
     if(lastMove.col != -1 && lastMove.row != -1)
     {
         
-        Move try_empty = check_empty(gameState);
-        if (try_empty.col != -1000 && try_empty.row != -1000)
+        Move tempMove = lastMove;
+        tempMove.col+=1;
+        int rightPoints2 = rightPoints(gameState,tempMove,true);
+        if(rightPoints2 >= k-3)
         {
-            return try_empty;
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
         }
+        
+        tempMove = lastMove;
+        tempMove.col-=1;
+        int leftPoints2 = leftPoints(gameState,tempMove,true);
+        if(leftPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row+=1;
+        int upPoints2 = upPoints(gameState,tempMove,true);
+        if(upPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row-=1;
+        int downPoints2 = downPoints(gameState,tempMove,true);
+        if(downPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row+=1;
+        tempMove.col -=1;
+        int leftDiagPoints2 = leftDiagPoints(gameState,tempMove,true);
+        if(leftDiagPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row+=1;
+        tempMove.col +=1;
+        int rightDiagPoints2 = rightDiagPoints(gameState,tempMove,true);
+        if(rightDiagPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row-=1;
+        tempMove.col -=1;
+        int downLeftDiagPoints2 = downLeftDiagPoints(gameState,tempMove,true);
+        if(downLeftDiagPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        tempMove = lastMove;
+        tempMove.row-=1;
+        tempMove.col +=1;
+        int downRightDiagPoints2 = downRightDiagPoints(gameState,tempMove,true);
+        if(downRightDiagPoints2 >= k-3)
+        {
+            if(gameState[tempMove.col][tempMove.row] == NO_PIECE)
+                return tempMove;
+        }
+        
+        
+        
+        
         
         std::cout << "CHECKING ALL SIDES" << std::endl;
         

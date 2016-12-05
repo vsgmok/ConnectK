@@ -54,6 +54,8 @@ private:
     Move checkLeftDiag(int ** state, Move m, bool defense);
     Move checkDownLeftDiag(int ** state, Move m, bool defense);
     Move checkDownRightDiag(int ** state, Move m, bool defense);
+
+    Move check_empty(int** state);
     
     std::vector<Move> availableMoves(int** state);
     
