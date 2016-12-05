@@ -56,6 +56,7 @@ private:
     Move checkDownRightDiag(int ** state, Move m, bool defense);
 
     Move check_empty(int** state);
+    Move find_move(int** state, std::string dir);
     
     std::vector<Move> availableMoves(int** state);
     

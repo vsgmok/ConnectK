@@ -103,7 +103,7 @@ Move AIShell::check_empty(int** state) {
             
             tempMove.col = lastMove.col + offset*d[0];
             tempMove.row = lastMove.row + offset*d[1];
-            std::cout << "col: " << tempMove.col << ", row: " << tempMove.row << ", offset: " << offset << ", offset*d[0]: " << offset*d[0] << std::endl;
+            //std::cout << "col: " << tempMove.col << ", row: " << tempMove.row << ", offset: " << offset << ", offset*d[0]: " << offset*d[0] << std::endl;
 
             if (tempMove.col >= numCols || \
                 tempMove.row >= numRows || \
@@ -121,9 +121,13 @@ Move AIShell::check_empty(int** state) {
             {
                 emptyMove = tempMove;
             }
+            else if (state[tempMove.col][tempMove.row] = AI_PIECE)
+            {
+                break;
+            }
         }
-        std::cout << "Checking direction " << dir << std::endl;
-        std::cout << "Value: " << val << std::endl << std::endl;
+        //std::cout << "Checking direction " << dir << std::endl;
+        //std::cout << "Value: " << val << std::endl << std::endl;
 
         if (val > best_val) 
         {
@@ -137,7 +141,112 @@ Move AIShell::check_empty(int** state) {
     }
     if (best_val >= 3)
     {
-        return best_move;
+        return find_move(state, best_dir);
+    }
+    return Move(-1000,-1000);
+}
+
+Move AIShell::find_move(int** state, std::string dir)
+{
+    int thatdir[2];
+    int oppdir[2];
+
+    if (dir == "up")
+    {
+        thatdir[0] = 0;
+        thatdir[1] = 1;
+    }
+    else if (dir == "down")
+    {
+        thatdir[0] = 0;
+        thatdir[1] = -1;
+    }
+    else if (dir == "left")
+    {
+        thatdir[0] = -1;
+        thatdir[1] = 0;
+    }
+    else if (dir == "right")
+    {
+        thatdir[0] = 1;
+        thatdir[1] = 0;
+    }
+    else if (dir == "upright")
+    {
+        thatdir[0] = 1;
+        thatdir[1] = 1;
+    }
+    else if (dir == "downright")
+    {
+        thatdir[0] = 1;
+        thatdir[1] = -1;
+    }
+    else if (dir == "downleft")
+    {
+        thatdir[0] = -1;
+        thatdir[1] = -1;
+    }
+    else if (dir == "upleft")
+    {
+        thatdir[0] = -1;
+        thatdir[1] = 1;
+    }
+
+    oppdir[0] = thatdir[0]*-1;
+    oppdir[1] = thatdir[-1]*-1;
+
+    std::cout << dir << std::endl;
+
+    Move tempMove = lastMove;
+    for (int offset = 0; offset < k; ++offset)
+    {
+        tempMove.col = lastMove.col + offset*thatdir[0];
+        tempMove.row = lastMove.row + offset*thatdir[1];
+
+        std::cout << "col: " << tempMove.col << ", row: " << tempMove.row << ", offset: " << offset << ", offset*thatdir[0]: " << offset*thatdir[0] << std::endl;
+        std::cout << std::endl;
+
+        if (tempMove.col >= numCols || \
+            tempMove.row >= numRows || \
+            tempMove.col < 0 || \
+            tempMove.row < 0)
+        {
+            break; //out of bounds
+        }
+
+        else if (state[tempMove.col][tempMove.row] == NO_PIECE)
+        {
+            return tempMove;
+        }
+        else if (state[tempMove.col][tempMove.row] == AI_PIECE)
+        {
+            break;
+        }
+    }
+
+    for (int offset = 0; offset < k; ++offset)
+    {
+        tempMove.col = lastMove.col + offset*oppdir[0];
+        tempMove.row = lastMove.row + offset*oppdir[1];
+
+        std::cout << "col: " << tempMove.col << ", row: " << tempMove.row << ", offset: " << offset << ", offset*oppdir[0]: " << offset*oppdir[0] << std::endl;
+        std::cout << std::endl;
+
+        if (tempMove.col >= numCols || \
+            tempMove.row >= numRows || \
+            tempMove.col < 0 || \
+            tempMove.row < 0)
+        {
+            break; //out of bounds
+        }
+        else if (state[tempMove.col][tempMove.row] == NO_PIECE)
+        {
+            return tempMove;
+        }
+        else if (state[tempMove.col][tempMove.row] == AI_PIECE)
+        {
+            break;
+        }
     }
     return Move(-1000,-1000);
 }
